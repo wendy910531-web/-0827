@@ -25,7 +25,7 @@
     #game-container {
       position: relative;
       width: 100%;
-      max-width: 450px; /* 模擬手機直式螢幕 */
+      max-width: 450px;
       height: 100vh;
       max-height: 800px;
       background-color: #000;
@@ -34,7 +34,6 @@
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
     }
 
-    /* 影片與圖片通用樣式 */
     .media-element {
       position: absolute;
       top: 0;
@@ -49,7 +48,34 @@
       display: block;
     }
 
-    /* 互動 UI 層 */
+    /* 點擊解鎖聲音畫面的 Overlay */
+    #start-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 50;
+      cursor: pointer;
+    }
+
+    .start-btn {
+      background: #ff9800;
+      color: #fff;
+      border: none;
+      padding: 16px 32px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border-radius: 30px;
+      box-shadow: 0 4px 15px rgba(255, 152, 0, 0.5);
+      animation: pulse 1.5s infinite;
+    }
+
     .ui-overlay {
       position: absolute;
       top: 0;
@@ -66,7 +92,6 @@
       z-index: 10;
     }
 
-    /* 簡訊通知彈窗 */
     .sms-notification {
       position: absolute;
       top: 22%;
@@ -106,7 +131,6 @@
       font-weight: bold;
     }
 
-    /* 按鈕組排版 (6個按鈕) */
     .button-group {
       width: 100%;
       display: flex;
@@ -133,15 +157,14 @@
       transform: scale(1.02);
     }
 
-    /* 動態大學門樓校名 overlay */
     #gate-title-overlay {
       position: absolute;
-      top: 9.5%; /* 精確覆蓋 img2.jpg 大門牌樓的空白處 */
+      top: 9.5%;
       left: 50%;
       transform: translateX(-50%);
       font-size: 1.3rem;
       font-weight: bold;
-      color: #d4af37; /* 金色標題 */
+      color: #d4af37;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
       letter-spacing: 2px;
       z-index: 11;
@@ -149,7 +172,6 @@
       white-space: nowrap;
     }
 
-    /* 第一輪失敗紅字警告彈窗 */
     #alert-modal {
       position: absolute;
       top: 50%;
@@ -166,7 +188,6 @@
       text-align: center;
     }
 
-    /* CTA 宣傳按鈕 */
     .cta-btn {
       background: #ff9800;
       color: #fff;
@@ -190,16 +211,20 @@
 <body>
 
   <div id="game-container">
-    <!-- 影片 1：考完等待放榜 -->
-    <video id="video1" class="media-element active" playsinline muted>
+    <!-- 解鎖音訊覆蓋層 -->
+    <div id="start-overlay" onclick="startGame()">
+      <button class="start-btn">🔊 點擊開啟體驗（含旁白音效）</button>
+    </div>
+
+    <!-- 影片 1（去掉了 muted 屬性，依靠點擊開始解鎖） -->
+    <video id="video1" class="media-element active" playsinline>
       <source src="video1.mp4" type="video/mp4">
     </video>
 
-    <!-- 圖片 1：第一輪簡訊 + 6個志願選擇 UI -->
+    <!-- 圖片 1：簡訊與 6 個按鈕 -->
     <img id="img1" class="media-element" src="img1.jpg" alt="手機桌面">
     
     <div id="ui-round1" class="ui-overlay">
-      <!-- 簡訊彈窗 -->
       <div class="sms-notification">
         <div class="sms-header">
           <span>💬 訊息 ‧ 大考中心</span>
@@ -211,7 +236,6 @@
         </div>
       </div>
 
-      <!-- 6 個志願按鈕 -->
       <div class="button-group">
         <p style="font-size: 0.85rem; margin-bottom: 6px; color: #eee; text-shadow: 0 1px 3px #000;">請選擇欲選填之夢幻校系：</p>
         <button class="school-btn" onclick="triggerFail()">國立臺灣大學 外文系</button>
@@ -230,17 +254,17 @@
       <p style="font-size: 0.85rem; margin-top: 8px;">連第一階段都無法通過...</p>
     </div>
 
-    <!-- 影片 2：時間倒流重生 -->
-    <video id="video2" class="media-element" playsinline muted>
+    <!-- 影片 2 -->
+    <video id="video2" class="media-element" playsinline>
       <source src="video2.mp4" type="video/mp4">
     </video>
 
-    <!-- 影片 3：書店選 235 講義 -->
-    <video id="video3" class="media-element" playsinline muted>
+    <!-- 影片 3 -->
+    <video id="video3" class="media-element" playsinline>
       <source src="video3.mp4" type="video/mp4">
     </video>
 
-    <!-- 圖片 2：第二輪逆轉 + 成功結算 UI -->
+    <!-- 圖片 2 -->
     <img id="img2" class="media-element" src="img2.jpg" alt="校門正取畫面">
     <div id="gate-title-overlay">國立臺灣大學</div>
 
@@ -278,8 +302,16 @@
     const uiFinal = document.getElementById('ui-final');
     const alertModal = document.getElementById('alert-modal');
     const gateTitleOverlay = document.getElementById('gate-title-overlay');
+    const startOverlay = document.getElementById('start-overlay');
 
-    v1.play();
+    // 玩家點擊「開啟體驗」按鈕後，解鎖音訊並開始播放影片 1
+    function startGame() {
+      startOverlay.style.display = 'none';
+      v1.muted = false; // 取消靜音
+      v1.play().catch(error => {
+        console.log("Autoplay was prevented:", error);
+      });
+    }
 
     // 影片 1 播完：進入【圖片 1 + 簡訊 & 6個志願按鈕】
     v1.onended = function() {
@@ -296,6 +328,7 @@
         uiRound1.style.display = 'none';
         img1.classList.remove('active');
         
+        v2.muted = false;
         v2.classList.add('active');
         v2.play();
       }, 1800);
@@ -304,6 +337,7 @@
     // 影片 2 (重生) 播完 ➔ 播放影片 3 (書店)
     v2.onended = function() {
       v2.classList.remove('active');
+      v3.muted = false;
       v3.classList.add('active');
       v3.play();
     };
@@ -317,7 +351,6 @@
 
     // 第二輪：動態更新大門上的校名，並顯示最終結局
     function triggerSuccess(schoolName) {
-      // 在校門牌樓上填入玩家選的校名
       gateTitleOverlay.innerText = schoolName;
       gateTitleOverlay.style.display = 'block';
 

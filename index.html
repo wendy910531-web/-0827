@@ -13,7 +13,7 @@
     }
 
     body {
-      background-color: #121212;
+      background-color: #0d0d11;
       color: #ffffff;
       display: flex;
       justify-content: center;
@@ -28,12 +28,13 @@
       max-width: 450px;
       height: 100vh;
       max-height: 800px;
-      background-color: #000;
+      background: linear-gradient(180deg, #1a1a24 0%, #0d0d11 100%); /* 避免閃純黑，改用暗質感漸層 */
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
     }
 
+    /* 解決黑畫面關鍵：加上 opacity 淡入淡出轉場動畫 */
     .media-element {
       position: absolute;
       top: 0;
@@ -41,11 +42,14 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      display: none;
+      opacity: 0;
+      transition: opacity 0.35s ease-in-out; /* 滑順淡入淡出 */
+      pointer-events: none;
     }
 
     .active {
-      display: block;
+      opacity: 1;
+      pointer-events: auto;
     }
 
     /* 解鎖聲音彈窗 */
@@ -76,7 +80,7 @@
       animation: pulse 1.5s infinite;
     }
 
-    /* 📱 手機桌面 UI Overlay (狀態列 + 大時鐘) */
+    /* 📱 手機桌面 UI */
     #phone-desktop-ui {
       position: absolute;
       top: 0;
@@ -88,10 +92,9 @@
       align-items: center;
       padding-top: 10px;
       z-index: 10;
-      pointer-events: none; /* 讓點擊事件可以穿透 */
+      pointer-events: none;
     }
 
-    /* 頂部狀態列 */
     .status-bar {
       width: 100%;
       padding: 0 20px;
@@ -104,7 +107,6 @@
       text-shadow: 0 1px 3px rgba(0,0,0,0.6);
     }
 
-    /* iOS 風格鎖定畫面大時鐘 */
     .lock-screen-clock {
       margin-top: 25px;
       text-align: center;
@@ -141,7 +143,6 @@
       z-index: 15;
     }
 
-    /* 簡訊通知彈窗 */
     .sms-notification {
       position: absolute;
       top: 25%;
@@ -241,7 +242,10 @@
       text-align: center;
     }
 
+    /* 購買 CTA 按鈕 */
     .cta-btn {
+      display: inline-block;
+      text-decoration: none;
       background: #ff9800;
       color: #fff;
       border: none;
@@ -252,6 +256,7 @@
       cursor: pointer;
       margin-top: 15px;
       animation: pulse 1.5s infinite;
+      box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
     }
 
     @keyframes pulse {
@@ -271,14 +276,14 @@
     </div>
 
     <!-- 影片 1 -->
-    <video id="video1" class="media-element active" playsinline>
+    <video id="video1" class="media-element active" playsinline preload="auto">
       <source src="video1.mp4" type="video/mp4">
     </video>
 
     <!-- 圖片 1：桌面背景 -->
     <img id="img1" class="media-element" src="img1.jpg" alt="手機桌面背景">
 
-    <!-- 📱 擬真手機桌面 Overlay (頂部狀態列 + 鎖定畫面大時鐘) -->
+    <!-- 手機桌面 UI -->
     <div id="phone-desktop-ui">
       <div class="status-bar">
         <span>中華電信</span>
@@ -292,7 +297,6 @@
     
     <!-- 第一輪選擇 UI -->
     <div id="ui-round1" class="ui-overlay">
-      <!-- 簡訊彈窗 -->
       <div class="sms-notification">
         <div class="sms-header">
           <span>💬 訊息 ‧ 大考中心</span>
@@ -304,7 +308,6 @@
         </div>
       </div>
 
-      <!-- 6 個志願按鈕 -->
       <div class="button-group">
         <p style="font-size: 0.85rem; margin-bottom: 6px; color: #fff; text-shadow: 0 1px 4px #000;">請選擇欲選填之夢幻校系：</p>
         <button class="school-btn" onclick="triggerFail()">國立臺灣大學 外文系</button>
@@ -316,7 +319,7 @@
       </div>
     </div>
 
-    <!-- 第一輪失敗警告彈窗 -->
+    <!-- 失敗警告彈窗 -->
     <div id="alert-modal">
       <h3>⚠️ 篩選失敗！</h3>
       <p>未達該校系英文門檻 (英文 8 級分，差 1 級分)</p>
@@ -324,12 +327,12 @@
     </div>
 
     <!-- 影片 2 -->
-    <video id="video2" class="media-element" playsinline>
+    <video id="video2" class="media-element" playsinline preload="auto">
       <source src="video2.mp4" type="video/mp4">
     </video>
 
     <!-- 影片 3 -->
-    <video id="video3" class="media-element" playsinline>
+    <video id="video3" class="media-element" playsinline preload="auto">
       <source src="video3.mp4" type="video/mp4">
     </video>
 
@@ -355,7 +358,11 @@
       <div style="font-size: 1.8rem; color: #ffd700; font-weight: bold;">🎉 恭喜錄取！</div>
       <p id="final-desc" style="margin: 15px 0; font-size: 1.1rem; line-height: 1.4;"></p>
       <p style="font-size: 1rem; font-weight: bold; color: #fff;">多這一級分，把人生的主導權拿回自己手上！</p>
-      <button class="cta-btn" onclick="alert('導流至 235 課程諮詢頁面！')">免費領取：235 補級分祕笈</button>
+      
+      <!-- 直接跳轉南一官方購買頁面 -->
+      <a class="cta-btn" href="https://shop.nani1953.com.tw/products/235%E6%A8%A1%E8%80%83%E9%A1%8C-%E5%AD%B8%E6%B8%AC%E5%BE%A9%E7%BF%92%E8%AC%9B%E7%BE%A9-%E8%8B%B1%E6%96%87%E7%A7%91" target="_blank">
+        ⚡ 最後倒流！快來購買 235 英文補級分秘笈
+      </a>
     </div>
   </div>
 
@@ -376,6 +383,10 @@
     const gateTitleOverlay = document.getElementById('gate-title-overlay');
     const startOverlay = document.getElementById('start-overlay');
 
+    // 預先加載影片防止卡頓黑畫面
+    v2.load();
+    v3.load();
+
     function playBGM() {
       bgm.play().catch(e => console.log("BGM 播放被阻擋"));
     }
@@ -390,15 +401,16 @@
       v1.play();
     }
 
-    // 影片 1 播完 ➔ 顯示圖片 1 + 手機鎖定畫面UI + 簡訊 + 志願選項
+    // 影片 1 結束 ➔ 切換圖片 1
     v1.onended = function() {
-      v1.classList.remove('active');
       img1.classList.add('active');
-      phoneDesktopUI.style.display = 'flex'; // 開啟手機時鐘/狀態列 UI
+      v1.classList.remove('active');
+      phoneDesktopUI.style.display = 'flex';
       uiRound1.style.display = 'flex';
       playBGM();
     };
 
+    // 第一輪失敗 ➔ 播放影片 2
     function triggerFail() {
       alertModal.style.display = 'block';
       stopBGM();
@@ -406,23 +418,25 @@
       setTimeout(() => {
         alertModal.style.display = 'none';
         uiRound1.style.display = 'none';
-        phoneDesktopUI.style.display = 'none'; // 隱藏手機桌面 UI
-        img1.classList.remove('active');
+        phoneDesktopUI.style.display = 'none';
         
         v2.classList.add('active');
+        img1.classList.remove('active');
         v2.play();
       }, 1800);
     }
 
+    // 影片 2 結束 ➔ 無縫接續影片 3
     v2.onended = function() {
-      v2.classList.remove('active');
       v3.classList.add('active');
+      v2.classList.remove('active');
       v3.play();
     };
 
+    // 影片 3 結束 ➔ 切換圖片 2
     v3.onended = function() {
-      v3.classList.remove('active');
       img2.classList.add('active');
+      v3.classList.remove('active');
       uiRound2.style.display = 'flex';
       playBGM();
     };

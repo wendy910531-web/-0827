@@ -28,10 +28,20 @@
       max-width: 450px;
       height: 100vh;
       max-height: 800px;
-      background-color: #000000;
+      background-color: #111425;
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    }
+
+    /* 💡 Canvas 動態繪製的主角讀書底圖 */
+    #fallback-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
     }
 
     .media-element {
@@ -44,12 +54,13 @@
       opacity: 0;
       transition: opacity 0.2s ease-in-out;
       pointer-events: none;
+      z-index: 2;
     }
 
     .active {
       opacity: 1;
       pointer-events: auto;
-      z-index: 2;
+      z-index: 3;
     }
 
     /* 解鎖聲音彈窗 */
@@ -226,7 +237,7 @@
       white-space: nowrap;
     }
 
-    /* 第一輪失敗警告彈窗（加上微震動動畫震憾感） */
+    /* 失敗彈窗（震撼震動） */
     #alert-modal {
       position: absolute;
       top: 50%;
@@ -279,7 +290,9 @@
 <body>
 
   <div id="game-container">
-    <!-- 背景音樂與失敗恐怖音效 -->
+    <!-- 💡 最底層 Canvas：夜深人靜主角苦讀畫面 -->
+    <canvas id="fallback-canvas" width="450" height="800"></canvas>
+
     <audio id="bgm" src="bgm.mp3" loop></audio>
     <audio id="failSound" src="fail_sound.mp3" preload="auto"></audio>
 
@@ -291,8 +304,6 @@
     <video id="video1" class="media-element active" playsinline preload="auto">
       <source src="video1.mp4" type="video/mp4">
     </video>
-
-
 
     <!-- 手機桌面 UI -->
     <div id="phone-desktop-ui">
@@ -377,11 +388,84 @@
   </div>
 
   <script>
+    // 🎨 動態繪製「深夜主角讀書」桌布
+    function drawStudyScene() {
+      const cvs = document.getElementById('fallback-canvas');
+      const ctx = cvs.getContext('2d');
+      
+      // 夜晚房間背景
+      const grad = ctx.createLinearGradient(0, 0, 0, 800);
+      grad.addColorStop(0, '#0b0d1b');
+      grad.addColorStop(0.6, '#1a1c2e');
+      grad.addColorStop(1, '#080912');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 450, 800);
+
+      // 檯燈光束
+      ctx.save();
+      ctx.fillStyle = 'rgba(255, 230, 150, 0.15)';
+      ctx.beginPath();
+      ctx.moveTo(380, 200);
+      ctx.lineTo(80, 680);
+      ctx.lineTo(400, 680);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      // 書桌與書本
+      ctx.fillStyle = '#221914';
+      ctx.fillRect(0, 520, 450, 280); // 桌子
+
+      // 打開的書本
+      ctx.fillStyle = '#f0ebe1';
+      ctx.beginPath();
+      ctx.moveTo(120, 550);
+      ctx.lineTo(220, 540);
+      ctx.lineTo(220, 640);
+      ctx.lineTo(120, 650);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(225, 540);
+      ctx.lineTo(325, 550);
+      ctx.lineTo(325, 650);
+      ctx.lineTo(225, 640);
+      ctx.closePath();
+      ctx.fill();
+
+      // 書上的文字線條
+      ctx.strokeStyle = '#a0a0a0';
+      ctx.lineWidth = 2;
+      for (let y = 560; y < 630; y += 10) {
+        ctx.beginPath(); ctx.moveTo(140, y); ctx.lineTo(200, y - 2); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(245, y - 2); ctx.lineTo(305, y); ctx.stroke();
+      }
+
+      // 苦讀的主角剪影 (彎腰讀書)
+      ctx.fillStyle = '#11121d';
+      ctx.beginPath();
+      ctx.arc(170, 420, 32, 0, Math.PI * 2); // 頭
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(140, 500);
+      ctx.bezierCurveTo(130, 430, 200, 430, 220, 520); // 身體
+      ctx.closePath();
+      ctx.fill();
+
+      // 勵志精神標語
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.font = 'bold 20px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('深夜苦讀 ‧ 只為關鍵 1 級分', 225, 120);
+    }
+
+    drawStudyScene();
+
     const v1 = document.getElementById('video1');
     const v2 = document.getElementById('video2');
     const v3 = document.getElementById('video3');
-    
-    const img1 = document.getElementById('img1');
     const img2 = document.getElementById('img2');
     const bgm = document.getElementById('bgm');
     const failSound = document.getElementById('failSound');
@@ -409,16 +493,14 @@
     }
 
     v1.onended = function() {
-      img1.classList.add('active');
       v1.classList.remove('active');
       phoneDesktopUI.style.display = 'flex';
       uiRound1.style.display = 'flex';
       playBGM();
     };
 
-    // 💥 第一輪失敗：播放恐怖音效 + 彈窗震動
     function triggerFail() {
-      stopBGM(); // 暫停背景音樂，凸顯恐怖音效
+      stopBGM();
       
       failSound.currentTime = 0;
       failSound.play().catch(e => console.log("音效播放被阻擋"));
@@ -431,24 +513,15 @@
         phoneDesktopUI.style.display = 'none';
         
         v2.classList.add('active');
-        img1.classList.remove('active');
         v2.play();
-      }, 2000); // 延長到 2 秒，給恐怖音效足夠的時間展現震撼感
+      }, 2000);
     }
 
-    // video2 快結束時預載 video3
-    v2.addEventListener('timeupdate', function() {
-      if (v2.duration - v2.currentTime < 0.5 && !v3.dataset.started) {
-        v3.dataset.started = "true";
-        v3.currentTime = 0;
-        v3.play();
-        v3.classList.add('active');
-      }
-    });
-
+    // 影片銜接
     v2.onended = function() {
+      v3.play();
+      v3.classList.add('active');
       v2.classList.remove('active');
-      v3.dataset.started = "";
     };
 
     v3.onended = function() {

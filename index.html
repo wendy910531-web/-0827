@@ -226,20 +226,31 @@
       white-space: nowrap;
     }
 
+    /* 第一輪失敗警告彈窗（加上微震動動畫震憾感） */
     #alert-modal {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: #d32f2f;
+      background: #b71c1c;
       color: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      width: 80%;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+      padding: 22px;
+      border-radius: 12px;
+      width: 82%;
+      box-shadow: 0 0 25px rgba(255, 0, 0, 0.6);
       display: none;
       z-index: 20;
       text-align: center;
+      border: 2px solid #ff5252;
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translate(-50%, -50%); }
+      20% { transform: translate(-54%, -50%); }
+      40% { transform: translate(-46%, -50%); }
+      60% { transform: translate(-52%, -50%); }
+      80% { transform: translate(-48%, -50%); }
     }
 
     .cta-btn {
@@ -268,7 +279,9 @@
 <body>
 
   <div id="game-container">
+    <!-- 背景音樂與失敗恐怖音效 -->
     <audio id="bgm" src="bgm.mp3" loop></audio>
+    <audio id="failSound" src="fail_sound.mp3" preload="auto"></audio>
 
     <div id="start-overlay" onclick="startGame()">
       <button class="start-btn">🔊 點擊開始體驗</button>
@@ -320,9 +333,9 @@
 
     <!-- 失敗警告彈窗 -->
     <div id="alert-modal">
-      <h3>⚠️ 篩選失敗！</h3>
-      <p>未達該校系英文門檻 (英文 8 級分，差 1 級分)</p>
-      <p style="font-size: 0.85rem; margin-top: 8px;">連第一階段都無法通過...</p>
+      <h3 style="font-size: 1.3rem; margin-bottom: 6px;">⚠️ 篩選失敗！</h3>
+      <p style="font-size: 1rem; font-weight: bold;">未達該校系英文門檻 (英文 8 級分，差 1 級分)</p>
+      <p style="font-size: 0.85rem; margin-top: 8px; opacity: 0.9;">連第一階段都無法通過...</p>
     </div>
 
     <!-- 影片 2 -->
@@ -372,6 +385,7 @@
     const img1 = document.getElementById('img1');
     const img2 = document.getElementById('img2');
     const bgm = document.getElementById('bgm');
+    const failSound = document.getElementById('failSound');
 
     const phoneDesktopUI = document.getElementById('phone-desktop-ui');
     const uiRound1 = document.getElementById('ui-round1');
@@ -395,7 +409,6 @@
       v1.play();
     }
 
-    // 影片 1 結束 ➔ 切換圖片 1
     v1.onended = function() {
       img1.classList.add('active');
       v1.classList.remove('active');
@@ -404,10 +417,14 @@
       playBGM();
     };
 
-    // 第一輪失敗 ➔ 播放影片 2
+    // 💥 第一輪失敗：播放恐怖音效 + 彈窗震動
     function triggerFail() {
+      stopBGM(); // 暫停背景音樂，凸顯恐怖音效
+      
+      failSound.currentTime = 0;
+      failSound.play().catch(e => console.log("音效播放被阻擋"));
+
       alertModal.style.display = 'block';
-      stopBGM();
 
       setTimeout(() => {
         alertModal.style.display = 'none';
@@ -417,27 +434,24 @@
         v2.classList.add('active');
         img1.classList.remove('active');
         v2.play();
-      }, 1800);
+      }, 2000); // 延長到 2 秒，給恐怖音效足夠的時間展現震撼感
     }
 
-    // 💡 關鍵優化：在 video2 播放時預載並解碼 video3 第一幀
+    // video2 快結束時預載 video3
     v2.addEventListener('timeupdate', function() {
-      // 當 video2 播到剩下最後 0.5 秒時，先讓 video3 準備並播放，防止黑畫面
       if (v2.duration - v2.currentTime < 0.5 && !v3.dataset.started) {
         v3.dataset.started = "true";
         v3.currentTime = 0;
         v3.play();
-        v3.classList.add('active'); // 先把 video3 疊上來
+        v3.classList.add('active');
       }
     });
 
-    // video2 完全播完後，隱藏 video2
     v2.onended = function() {
       v2.classList.remove('active');
-      v3.dataset.started = ""; // 重設標記
+      v3.dataset.started = "";
     };
 
-    // 影片 3 結束 ➔ 切換圖片 2
     v3.onended = function() {
       img2.classList.add('active');
       v3.classList.remove('active');

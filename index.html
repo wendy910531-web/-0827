@@ -28,20 +28,10 @@
       max-width: 450px;
       height: 100vh;
       max-height: 800px;
-      background-color: #111425;
+      background-color: #000000;
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-    }
-
-    /* 💡 Canvas 動態繪製的主角讀書底圖 */
-    #fallback-canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
     }
 
     .media-element {
@@ -52,15 +42,23 @@
       height: 100%;
       object-fit: cover;
       opacity: 0;
-      transition: opacity 0.2s ease-in-out;
+      /* 💡 核心 1：開啟 GPU 硬體加速，防止切換時繪製 Lag */
+      will-change: opacity;
+      transform: translateZ(0);
+      transition: opacity 0.1s linear;
       pointer-events: none;
-      z-index: 2;
     }
 
-    .active {
-      opacity: 1;
-      pointer-events: auto;
-      z-index: 3;
+    /* 圖層層級精確控制 */
+    #video1 { z-index: 10; }
+    #img1   { z-index: 8; }
+    #video2 { z-index: 6; }
+    #video3 { z-index: 5; } /* video3 預先隱藏在 video2 底下 */
+    #img2   { z-index: 4; }
+
+    .show {
+      opacity: 1 !important;
+      pointer-events: auto !important;
     }
 
     /* 解鎖聲音彈窗 */
@@ -102,7 +100,7 @@
       flex-direction: column;
       align-items: center;
       padding-top: 10px;
-      z-index: 10;
+      z-index: 20;
       pointer-events: none;
     }
 
@@ -151,7 +149,7 @@
       align-items: center;
       padding: 20px;
       text-align: center;
-      z-index: 15;
+      z-index: 25;
     }
 
     .sms-notification {
@@ -166,7 +164,7 @@
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
       color: #000;
       text-align: left;
-      z-index: 16;
+      z-index: 26;
       pointer-events: auto;
     }
 
@@ -232,12 +230,12 @@
       color: #d4af37;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
       letter-spacing: 2px;
-      z-index: 11;
+      z-index: 21;
       display: none;
       white-space: nowrap;
     }
 
-    /* 失敗彈窗（震撼震動） */
+    /* 失敗警告彈窗 */
     #alert-modal {
       position: absolute;
       top: 50%;
@@ -250,7 +248,7 @@
       width: 82%;
       box-shadow: 0 0 25px rgba(255, 0, 0, 0.6);
       display: none;
-      z-index: 20;
+      z-index: 30;
       text-align: center;
       border: 2px solid #ff5252;
       animation: shake 0.4s ease-in-out;
@@ -290,9 +288,6 @@
 <body>
 
   <div id="game-container">
-    <!-- 💡 最底層 Canvas：夜深人靜主角苦讀畫面 -->
-    <canvas id="fallback-canvas" width="450" height="800"></canvas>
-
     <audio id="bgm" src="bgm.mp3" loop></audio>
     <audio id="failSound" src="fail_sound.mp3" preload="auto"></audio>
 
@@ -301,9 +296,25 @@
     </div>
 
     <!-- 影片 1 -->
-    <video id="video1" class="media-element active" playsinline preload="auto">
+    <video id="video1" class="media-element show" playsinline preload="auto">
       <source src="video1.mp4" type="video/mp4">
     </video>
+
+    <!-- 圖片 1：桌面背景 -->
+    <img id="img1" class="media-element" src="img1.jpg" alt="手機桌面背景">
+
+    <!-- 影片 2 (倒流) -->
+    <video id="video2" class="media-element" playsinline preload="auto">
+      <source src="video2.mp4" type="video/mp4">
+    </video>
+
+    <!-- 影片 3 (書店) -->
+    <video id="video3" class="media-element" playsinline preload="auto">
+      <source src="video3.mp4" type="video/mp4">
+    </video>
+
+    <!-- 圖片 2：校門畫面 -->
+    <img id="img2" class="media-element" src="img2.jpg" alt="校門正取畫面">
 
     <!-- 手機桌面 UI -->
     <div id="phone-desktop-ui">
@@ -348,18 +359,6 @@
       <p style="font-size: 0.85rem; margin-top: 8px; opacity: 0.9;">連第一階段都無法通過...</p>
     </div>
 
-    <!-- 影片 2 -->
-    <video id="video2" class="media-element" playsinline preload="auto">
-      <source src="video2.mp4" type="video/mp4">
-    </video>
-
-    <!-- 影片 3 -->
-    <video id="video3" class="media-element" playsinline preload="auto">
-      <source src="video3.mp4" type="video/mp4">
-    </video>
-
-    <!-- 圖片 2：校門畫面 -->
-    <img id="img2" class="media-element" src="img2.jpg" alt="校門正取畫面">
     <div id="gate-title-overlay">國立臺灣大學</div>
 
     <!-- 第二輪綠燈選擇 UI -->
@@ -382,90 +381,17 @@
       <p style="font-size: 1rem; font-weight: bold; color: #fff;">多這一級分，把人生的主導權拿回自己手上！</p>
       
       <a class="cta-btn" href="https://shop.nani1953.com.tw/products/235%E6%A8%A1%E8%80%83%E9%A1%8C-%E5%AD%B8%E6%B8%AC%E5%BE%A9%E7%BF%92%E8%AC%9B%E7%BE%A9-%E8%8B%B1%E6%96%87%E7%A7%91" target="_blank">
-        ⚡ 快來購買 235 英文補級分秘笈
+        ⚡ 最後倒流！快來購買 235 英文補級分秘笈
       </a>
     </div>
   </div>
 
   <script>
-    // 🎨 動態繪製「深夜主角讀書」桌布
-    function drawStudyScene() {
-      const cvs = document.getElementById('fallback-canvas');
-      const ctx = cvs.getContext('2d');
-      
-      // 夜晚房間背景
-      const grad = ctx.createLinearGradient(0, 0, 0, 800);
-      grad.addColorStop(0, '#0b0d1b');
-      grad.addColorStop(0.6, '#1a1c2e');
-      grad.addColorStop(1, '#080912');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, 450, 800);
-
-      // 檯燈光束
-      ctx.save();
-      ctx.fillStyle = 'rgba(255, 230, 150, 0.15)';
-      ctx.beginPath();
-      ctx.moveTo(380, 200);
-      ctx.lineTo(80, 680);
-      ctx.lineTo(400, 680);
-      ctx.closePath();
-      ctx.fill();
-      ctx.restore();
-
-      // 書桌與書本
-      ctx.fillStyle = '#221914';
-      ctx.fillRect(0, 520, 450, 280); // 桌子
-
-      // 打開的書本
-      ctx.fillStyle = '#f0ebe1';
-      ctx.beginPath();
-      ctx.moveTo(120, 550);
-      ctx.lineTo(220, 540);
-      ctx.lineTo(220, 640);
-      ctx.lineTo(120, 650);
-      ctx.closePath();
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.moveTo(225, 540);
-      ctx.lineTo(325, 550);
-      ctx.lineTo(325, 650);
-      ctx.lineTo(225, 640);
-      ctx.closePath();
-      ctx.fill();
-
-      // 書上的文字線條
-      ctx.strokeStyle = '#a0a0a0';
-      ctx.lineWidth = 2;
-      for (let y = 560; y < 630; y += 10) {
-        ctx.beginPath(); ctx.moveTo(140, y); ctx.lineTo(200, y - 2); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(245, y - 2); ctx.lineTo(305, y); ctx.stroke();
-      }
-
-      // 苦讀的主角剪影 (彎腰讀書)
-      ctx.fillStyle = '#11121d';
-      ctx.beginPath();
-      ctx.arc(170, 420, 32, 0, Math.PI * 2); // 頭
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.moveTo(140, 500);
-      ctx.bezierCurveTo(130, 430, 200, 430, 220, 520); // 身體
-      ctx.closePath();
-      ctx.fill();
-
-      // 勵志精神標語
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-      ctx.font = 'bold 20px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('深夜苦讀 ‧ 只為關鍵 1 級分', 225, 120);
-    }
-
-    drawStudyScene();
-
     const v1 = document.getElementById('video1');
     const v2 = document.getElementById('video2');
     const v3 = document.getElementById('video3');
+    
+    const img1 = document.getElementById('img1');
     const img2 = document.getElementById('img2');
     const bgm = document.getElementById('bgm');
     const failSound = document.getElementById('failSound');
@@ -477,6 +403,8 @@
     const alertModal = document.getElementById('alert-modal');
     const gateTitleOverlay = document.getElementById('gate-title-overlay');
     const startOverlay = document.getElementById('start-overlay');
+
+    let v3WarmedUp = false;
 
     function playBGM() {
       bgm.play().catch(e => console.log("BGM 播放被阻擋"));
@@ -490,10 +418,18 @@
       startOverlay.style.display = 'none';
       stopBGM();
       v1.play();
+
+      // 💡 核心 2：在遊戲一開始，就先預熱解碼 video3 的第 0 秒，消除後續的解碼空窗
+      v3.play().then(() => {
+        v3.pause();
+        v3.currentTime = 0;
+        v3WarmedUp = true;
+      }).catch(e => console.log("v3 預熱等待手勢"));
     }
 
     v1.onended = function() {
-      v1.classList.remove('active');
+      img1.classList.add('show');
+      v1.classList.remove('show');
       phoneDesktopUI.style.display = 'flex';
       uiRound1.style.display = 'flex';
       playBGM();
@@ -503,7 +439,7 @@
       stopBGM();
       
       failSound.currentTime = 0;
-      failSound.play().catch(e => console.log("音效播放被阻擋"));
+      failSound.play().catch(e => console.log("音效阻擋"));
 
       alertModal.style.display = 'block';
 
@@ -512,21 +448,39 @@
         uiRound1.style.display = 'none';
         phoneDesktopUI.style.display = 'none';
         
-        v2.classList.add('active');
+        v2.classList.add('show');
+        img1.classList.remove('show');
         v2.play();
       }, 2000);
     }
 
-    // 影片銜接
-    v2.onended = function() {
-      v3.play();
-      v3.classList.add('active');
-      v2.classList.remove('active');
-    };
+    // 💡 核心 3：無縫過渡演算法（在 video2 結束前 0.2 秒偷跑 video3 並切換層級）
+    let hasSwitched = false;
+    v2.addEventListener('timeupdate', function() {
+      const timeLeft = v2.duration - v2.currentTime;
+      
+      // 當 video2 還剩不到 0.2 秒時提前發動
+      if (timeLeft <= 0.2 && !hasSwitched) {
+        hasSwitched = true;
+        
+        // 1. 先播放 video3
+        v3.play();
+        v3.classList.add('show');
+        
+        // 2. 提升 video3 的 z-index 蓋過 video2
+        v3.style.zIndex = "7"; 
+        
+        // 3. 延遲 200 毫秒才關閉 video2，達到畫面 100% 交叉重疊（無黑畫面）
+        setTimeout(() => {
+          v2.classList.remove('show');
+          v2.pause();
+        }, 200);
+      }
+    });
 
     v3.onended = function() {
-      img2.classList.add('active');
-      v3.classList.remove('active');
+      img2.classList.add('show');
+      v3.classList.remove('show');
       uiRound2.style.display = 'flex';
       playBGM();
     };

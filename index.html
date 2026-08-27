@@ -56,46 +56,97 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.4);
       display: none;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-end;
       align-items: center;
       padding: 20px;
       text-align: center;
       z-index: 10;
     }
 
-    .ui-title {
-      font-size: 1.4rem;
-      margin-bottom: 15px;
-      font-weight: bold;
-      color: #fff;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    /* 簡訊通知彈窗 */
+    .sms-notification {
+      position: absolute;
+      top: 22%;
+      width: 85%;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(8px);
+      border-radius: 14px;
+      padding: 12px 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      color: #000;
+      text-align: left;
+      z-index: 12;
     }
 
+    .sms-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #666;
+      margin-bottom: 4px;
+    }
+
+    .sms-title {
+      font-weight: bold;
+      font-size: 0.9rem;
+      margin-bottom: 2px;
+    }
+
+    .sms-body {
+      font-size: 0.85rem;
+      color: #222;
+      line-height: 1.3;
+    }
+
+    .highlight-score {
+      color: #d32f2f;
+      font-weight: bold;
+    }
+
+    /* 按鈕組排版 (6個按鈕) */
     .button-group {
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
+      margin-bottom: 30px;
     }
 
     .school-btn {
-      background: rgba(255, 255, 255, 0.9);
-      color: #333;
+      background: rgba(255, 255, 255, 0.92);
+      color: #222;
       border: none;
-      padding: 14px 20px;
-      font-size: 1.1rem;
+      padding: 11px 15px;
+      font-size: 1rem;
       font-weight: bold;
       border-radius: 8px;
       cursor: pointer;
       transition: all 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }
 
     .school-btn:hover {
       background: #ffffff;
       transform: scale(1.02);
+    }
+
+    /* 動態大學門樓校名 overlay */
+    #gate-title-overlay {
+      position: absolute;
+      top: 9.5%; /* 精確覆蓋 img2.jpg 大門牌樓的空白處 */
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #d4af37; /* 金色標題 */
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+      letter-spacing: 2px;
+      z-index: 11;
+      display: none;
+      white-space: nowrap;
     }
 
     /* 第一輪失敗紅字警告彈窗 */
@@ -115,22 +166,17 @@
       text-align: center;
     }
 
-    #alert-modal h3 {
-      margin-bottom: 10px;
-      font-size: 1.5rem;
-    }
-
     /* CTA 宣傳按鈕 */
     .cta-btn {
       background: #ff9800;
       color: #fff;
       border: none;
-      padding: 16px 24px;
-      font-size: 1.2rem;
+      padding: 14px 24px;
+      font-size: 1.1rem;
       font-weight: bold;
       border-radius: 30px;
       cursor: pointer;
-      margin-top: 20px;
+      margin-top: 15px;
       animation: pulse 1.5s infinite;
     }
 
@@ -149,24 +195,39 @@
       <source src="video1.mp4" type="video/mp4">
     </video>
 
-    <!-- 圖片 1：第一輪成績單 + 志願選擇 UI -->
-    <img id="img1" class="media-element" src="img1.jpg" alt="成績單畫面">
+    <!-- 圖片 1：第一輪簡訊 + 6個志願選擇 UI -->
+    <img id="img1" class="media-element" src="img1.jpg" alt="手機桌面">
+    
     <div id="ui-round1" class="ui-overlay">
-      <div class="ui-title">英文：12 級分<br><small style="color: #ff5252;">(請點擊欲選填之夢幻校系)</small></div>
+      <!-- 簡訊彈窗 -->
+      <div class="sms-notification">
+        <div class="sms-header">
+          <span>💬 訊息 ‧ 大考中心</span>
+          <span>現在</span>
+        </div>
+        <div class="sms-title">113學測成績通知</div>
+        <div class="sms-body">
+          【大考中心】113學測成績：國12、<span class="highlight-score">英8</span>、數A9、社11、自10。應試號碼：10012345。
+        </div>
+      </div>
+
+      <!-- 6 個志願按鈕 -->
       <div class="button-group">
+        <p style="font-size: 0.85rem; margin-bottom: 6px; color: #eee; text-shadow: 0 1px 3px #000;">請選擇欲選填之夢幻校系：</p>
         <button class="school-btn" onclick="triggerFail()">國立臺灣大學 外文系</button>
         <button class="school-btn" onclick="triggerFail()">國立政治大學 傳播學院</button>
         <button class="school-btn" onclick="triggerFail()">國立清華大學 人文社會系</button>
         <button class="school-btn" onclick="triggerFail()">國立成功大學 外文系</button>
         <button class="school-btn" onclick="triggerFail()">國立臺灣師範大學 英語系</button>
+        <button class="school-btn" onclick="triggerFail()">國立交通大學 外文系</button>
       </div>
     </div>
 
     <!-- 第一輪失敗彈窗 -->
     <div id="alert-modal">
       <h3>⚠️ 篩選失敗！</h3>
-      <p>未達該校系英文門檻 (差 1 級分)</p>
-      <p style="font-size: 0.9rem; margin-top: 8px;">連第一階段都無法通過...</p>
+      <p>未達該校系英文門檻 (英文 8 級分，差 1 級分)</p>
+      <p style="font-size: 0.85rem; margin-top: 8px;">連第一階段都無法通過...</p>
     </div>
 
     <!-- 影片 2：時間倒流重生 -->
@@ -180,27 +241,31 @@
     </video>
 
     <!-- 圖片 2：第二輪逆轉 + 成功結算 UI -->
-    <img id="img2" class="media-element" src="img2.jpg" alt="逆轉成功畫面">
-    <div id="ui-round2" class="ui-overlay">
-      <div class="ui-title" style="color: #4caf50;">【 235 神助攻！補回關鍵 1 級分 】</div>
+    <img id="img2" class="media-element" src="img2.jpg" alt="校門正取畫面">
+    <div id="gate-title-overlay">國立臺灣大學</div>
+
+    <div id="ui-round2" class="ui-overlay" style="justify-content: flex-end;">
+      <div style="font-size: 1.1rem; color: #4caf50; font-weight: bold; margin-bottom: 10px; text-shadow: 0 2px 4px #000;">
+        【 235 神助攻！補回關鍵 1 級分 】
+      </div>
       <div class="button-group">
-        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('台大外文')">綠燈解鎖！正取：國立臺灣大學</button>
-        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('政大傳播')">綠燈解鎖！正取：國立政治大學</button>
-        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('清大人文')">綠燈解鎖！正取：國立清華大學</button>
+        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('國立臺灣大學')">綠燈解鎖！正取：國立臺灣大學</button>
+        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('國立政治大學')">綠燈解鎖！正取：國立政治大學</button>
+        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('國立清華大學')">綠燈解鎖！正取：國立清華大學</button>
+        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('國立成功大學')">綠燈解鎖！正取：國立成功大學</button>
       </div>
     </div>
 
     <!-- 最終結局畫面 -->
-    <div id="ui-final" class="ui-overlay">
-      <div class="ui-title" style="font-size: 1.8rem; color: #ffd700;">🎉 恭喜錄取！</div>
-      <p id="final-desc" style="margin: 15px 0; font-size: 1.1rem;"></p>
-      <p style="font-size: 1.2rem; font-weight: bold;">多這一級分，把人生的主導權拿回自己手上！</p>
+    <div id="ui-final" class="ui-overlay" style="justify-content: center; background: rgba(0,0,0,0.65);">
+      <div style="font-size: 1.8rem; color: #ffd700; font-weight: bold;">🎉 恭喜錄取！</div>
+      <p id="final-desc" style="margin: 15px 0; font-size: 1.1rem; line-height: 1.4;"></p>
+      <p style="font-size: 1rem; font-weight: bold; color: #fff;">多這一級分，把人生的主導權拿回自己手上！</p>
       <button class="cta-btn" onclick="alert('導流至 235 課程諮詢頁面！')">免費領取：235 補級分祕笈</button>
     </div>
   </div>
 
   <script>
-    // 取得元件
     const v1 = document.getElementById('video1');
     const v2 = document.getElementById('video2');
     const v3 = document.getElementById('video3');
@@ -212,18 +277,18 @@
     const uiRound2 = document.getElementById('ui-round2');
     const uiFinal = document.getElementById('ui-final');
     const alertModal = document.getElementById('alert-modal');
+    const gateTitleOverlay = document.getElementById('gate-title-overlay');
 
-    // 自動播放第一個影片
     v1.play();
 
-    // 影片 1 播完：進入【圖片 1 + 第一輪選擇 UI】
+    // 影片 1 播完：進入【圖片 1 + 簡訊 & 6個志願按鈕】
     v1.onended = function() {
       v1.classList.remove('active');
       img1.classList.add('active');
       uiRound1.style.display = 'flex';
     };
 
-    // 第一輪選擇：不管點哪個按鈕都觸發「失敗警報 ➔ 播放影片 2 (重生)」
+    // 第一輪：點擊任何學校觸發失敗
     function triggerFail() {
       alertModal.style.display = 'block';
       setTimeout(() => {
@@ -231,31 +296,34 @@
         uiRound1.style.display = 'none';
         img1.classList.remove('active');
         
-        // 播放影片 2 (重生)
         v2.classList.add('active');
         v2.play();
       }, 1800);
     }
 
-    // 影片 2 (重生) 播完：自動播放影片 3 (書店選 235)
+    // 影片 2 (重生) 播完 ➔ 播放影片 3 (書店)
     v2.onended = function() {
       v2.classList.remove('active');
       v3.classList.add('active');
       v3.play();
     };
 
-    // 影片 3 (書店) 播完：進入【圖片 2 + 第二輪選擇 UI】
+    // 影片 3 (書店) 播完 ➔ 進入【圖片 2 (校門) + 第二輪綠燈選擇 UI】
     v3.onended = function() {
       v3.classList.remove('active');
       img2.classList.add('active');
       uiRound2.style.display = 'flex';
     };
 
-    // 第二輪選擇：選擇成功進入最終結局
+    // 第二輪：動態更新大門上的校名，並顯示最終結局
     function triggerSuccess(schoolName) {
+      // 在校門牌樓上填入玩家選的校名
+      gateTitleOverlay.innerText = schoolName;
+      gateTitleOverlay.style.display = 'block';
+
       uiRound2.style.display = 'none';
       uiFinal.style.display = 'flex';
-      document.getElementById('final-desc').innerText = `因為補回了關鍵的 1 級分，你順利闖過篩選，成功考取【${schoolName}】！`;
+      document.getElementById('final-desc').innerText = `因為補回了關鍵的 1 級分，你順利通過篩選，成功考取【${schoolName}】！`;
     }
   </script>
 

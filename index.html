@@ -28,13 +28,12 @@
       max-width: 450px;
       height: 100vh;
       max-height: 800px;
-      background: linear-gradient(180deg, #1a1a24 0%, #0d0d11 100%); /* 避免閃純黑，改用暗質感漸層 */
+      background-color: #000000;
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
     }
 
-    /* 解決黑畫面關鍵：加上 opacity 淡入淡出轉場動畫 */
     .media-element {
       position: absolute;
       top: 0;
@@ -43,13 +42,14 @@
       height: 100%;
       object-fit: cover;
       opacity: 0;
-      transition: opacity 0.35s ease-in-out; /* 滑順淡入淡出 */
+      transition: opacity 0.2s ease-in-out;
       pointer-events: none;
     }
 
     .active {
       opacity: 1;
       pointer-events: auto;
+      z-index: 2;
     }
 
     /* 解鎖聲音彈窗 */
@@ -80,7 +80,7 @@
       animation: pulse 1.5s infinite;
     }
 
-    /* 📱 手機桌面 UI */
+    /* 手機桌面 UI */
     #phone-desktop-ui {
       position: absolute;
       top: 0;
@@ -242,7 +242,6 @@
       text-align: center;
     }
 
-    /* 購買 CTA 按鈕 */
     .cta-btn {
       display: inline-block;
       text-decoration: none;
@@ -359,7 +358,6 @@
       <p id="final-desc" style="margin: 15px 0; font-size: 1.1rem; line-height: 1.4;"></p>
       <p style="font-size: 1rem; font-weight: bold; color: #fff;">多這一級分，把人生的主導權拿回自己手上！</p>
       
-      <!-- 直接跳轉南一官方購買頁面 -->
       <a class="cta-btn" href="https://shop.nani1953.com.tw/products/235%E6%A8%A1%E8%80%83%E9%A1%8C-%E5%AD%B8%E6%B8%AC%E5%BE%A9%E7%BF%92%E8%AC%9B%E7%BE%A9-%E8%8B%B1%E6%96%87%E7%A7%91" target="_blank">
         ⚡ 快來購買 235 英文補級分秘笈
       </a>
@@ -382,10 +380,6 @@
     const alertModal = document.getElementById('alert-modal');
     const gateTitleOverlay = document.getElementById('gate-title-overlay');
     const startOverlay = document.getElementById('start-overlay');
-
-    // 預先加載影片防止卡頓黑畫面
-    v2.load();
-    v3.load();
 
     function playBGM() {
       bgm.play().catch(e => console.log("BGM 播放被阻擋"));
@@ -426,11 +420,21 @@
       }, 1800);
     }
 
-    // 影片 2 結束 ➔ 無縫接續影片 3
+    // 💡 關鍵優化：在 video2 播放時預載並解碼 video3 第一幀
+    v2.addEventListener('timeupdate', function() {
+      // 當 video2 播到剩下最後 0.5 秒時，先讓 video3 準備並播放，防止黑畫面
+      if (v2.duration - v2.currentTime < 0.5 && !v3.dataset.started) {
+        v3.dataset.started = "true";
+        v3.currentTime = 0;
+        v3.play();
+        v3.classList.add('active'); // 先把 video3 疊上來
+      }
+    });
+
+    // video2 完全播完後，隱藏 video2
     v2.onended = function() {
-      v3.classList.add('active');
       v2.classList.remove('active');
-      v3.play();
+      v3.dataset.started = ""; // 重設標記
     };
 
     // 影片 3 結束 ➔ 切換圖片 2

@@ -365,7 +365,6 @@
 
   <div id="game-container">
     <audio id="bgm" src="bgm.mp3" loop></audio>
-    <!-- 修正：將 ID 改回 failSound 以匹配 JavaScript 呼叫 -->
     <audio id="failSound" src="failSound.mp3" preload="auto"></audio>
 
     <div id="start-overlay" onclick="startGame()">
@@ -500,6 +499,14 @@
 
     function startGame() {
       startOverlay.style.display = 'none';
+      
+      // 藉由使用者點擊解鎖瀏覽器的音效限制
+      failSound.load();
+      failSound.play().then(() => {
+        failSound.pause();
+        failSound.currentTime = 0;
+      }).catch(e => console.log("靜音解鎖成功"));
+
       v1.muted = false; // 使用 Video1 原始音效
       v1.play();
     }
@@ -512,12 +519,12 @@
     };
 
     function triggerFail() {
+      // 暫停 BGM 以防聲音重疊
+      bgm.pause();
+
+      // 播放失敗音效
       failSound.currentTime = 0;
-      failSound.play().then(() => {
-        setTimeout(() => {
-          failSound.pause();
-        }, 1000);
-      }).catch(e => console.log("音效錯誤：", e));
+      failSound.play().catch(e => console.log("音效播放被阻擋：", e));
 
       alertModal.style.display = 'block';
 
@@ -525,8 +532,6 @@
         alertModal.style.display = 'none';
         uiRound1.style.display = 'none';
         phoneDesktopUI.style.display = 'none';
-        
-        bgm.pause();
         
         v2.muted = false;
         v2.classList.add('show');

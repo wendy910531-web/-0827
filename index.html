@@ -51,7 +51,8 @@
     /* 圖層層級控制 */
     #video1 { z-index: 10; }
     #video2 { z-index: 5; }
-    #video4 { z-index: 6; } /* 時間過場影片層級 */
+    #video4 { z-index: 6; }
+    #img2   { z-index: 12; } /* 最終結局畫面圖層 */
 
     .show {
       opacity: 1 !important;
@@ -86,60 +87,14 @@
       animation: pulse 1.5s infinite;
     }
 
-    /* 手機桌面 UI */
-    #phone-desktop-ui {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      padding-top: 10px;
-      z-index: 20;
-      pointer-events: none;
-    }
-
-    .status-bar {
-      width: 100%;
-      padding: 0 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #ffffff;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
-    }
-
-    .lock-screen-clock {
-      margin-top: 25px;
-      text-align: center;
-      color: #ffffff;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-    }
-
-    .lock-date {
-      font-size: 1.1rem;
-      font-weight: 500;
-      letter-spacing: 1px;
-    }
-
-    .lock-time {
-      font-size: 4.5rem;
-      font-weight: 700;
-      line-height: 1.1;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Rounded", sans-serif;
-    }
-
+    /* 簡訊選單浮層 UI */
     .ui-overlay {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.2);
+      background: rgba(0, 0, 0, 0.25);
       display: none;
       flex-direction: column;
       justify-content: flex-end;
@@ -151,7 +106,7 @@
 
     .sms-notification {
       position: absolute;
-      top: 25%;
+      top: 22%;
       width: 88%;
       background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(12px);
@@ -249,6 +204,22 @@
       80% { transform: translate(-48%, -50%); }
     }
 
+    /* 校門牌樓上方顯示的學校名稱 */
+    #gate-title-overlay {
+      position: absolute;
+      top: 17%; /* 壓在校門石磚上面的位置 */
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #d4af37;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+      letter-spacing: 2px;
+      z-index: 35;
+      display: none;
+      white-space: nowrap;
+    }
+
     .cta-btn {
       display: inline-block;
       text-decoration: none;
@@ -292,23 +263,14 @@
       <source src="video2.mp4" type="video/mp4">
     </video>
 
-    <!-- 💡 影片 4：時間飛逝過場影片 -->
+    <!-- 影片 4：時間飛逝過場動畫 -->
     <video id="video4" class="media-element" playsinline preload="auto">
       <source src="video4.mp4" type="video/mp4">
     </video>
 
-    <!-- 手機桌面 UI (共用) -->
-    <div id="phone-desktop-ui">
-      <div class="status-bar">
-        <span>中華電信</span>
-        <span>5G 📶 🔋 88%</span>
-      </div>
-      <div class="lock-screen-clock">
-        <div class="lock-date">6月5日 星期五</div>
-        <div class="lock-time">09:01</div>
-      </div>
-    </div>
-    
+    <!-- 圖片 2：校門正取畫面 (恭喜錄取的背景) -->
+    <img id="img2" class="media-element" src="img2.jpg" alt="校門正取畫面">
+
     <!-- 第一輪選擇 UI (失敗線) -->
     <div id="ui-round1" class="ui-overlay">
       <div class="sms-notification">
@@ -362,8 +324,11 @@
       </div>
     </div>
 
+    <!-- 校門牌樓上的學校名稱 -->
+    <div id="gate-title-overlay">國立臺灣大學</div>
+
     <!-- 最終結局畫面 -->
-    <div id="ui-final" class="ui-overlay" style="justify-content: center; background: rgba(0,0,0,0.75); z-index: 40;">
+    <div id="ui-final" class="ui-overlay" style="justify-content: center; background: rgba(0,0,0,0.65); z-index: 40;">
       <div style="font-size: 1.8rem; color: #ffd700; font-weight: bold;">🎉 恭喜錄取！</div>
       <p id="final-desc" style="margin: 15px 0; font-size: 1.1rem; line-height: 1.4; color: #fff;"></p>
       <p style="font-size: 1rem; font-weight: bold; color: #fff;">多這一級分，把人生的主導權拿回自己手上！</p>
@@ -378,15 +343,16 @@
     const v1 = document.getElementById('video1');
     const v2 = document.getElementById('video2');
     const v4 = document.getElementById('video4');
+    const img2 = document.getElementById('img2');
     
     const bgm = document.getElementById('bgm');
     const failSound = document.getElementById('failSound');
 
-    const phoneDesktopUI = document.getElementById('phone-desktop-ui');
     const uiRound1 = document.getElementById('ui-round1');
     const uiRound2 = document.getElementById('ui-round2');
     const uiFinal = document.getElementById('ui-final');
     const alertModal = document.getElementById('alert-modal');
+    const gateTitleOverlay = document.getElementById('gate-title-overlay');
     const startOverlay = document.getElementById('start-overlay');
 
     function playBGM() {
@@ -399,14 +365,13 @@
       v1.play();
     }
 
-    // 1. video1 播完 -> 顯示手機桌面 & 第一輪簡訊 (英8)
+    // 1. video1 播完 -> 畫面直接停留於 video1 最後一幀，並浮現簡訊與選項
     v1.onended = function() {
-      phoneDesktopUI.style.display = 'flex';
       uiRound1.style.display = 'flex';
       playBGM();
     };
 
-    // 2. 點擊學校失敗 -> 彈出警告 -> 播 video2 (倒流+書店)
+    // 2. 點擊學校失敗 -> 彈出警告 -> 切換至 video2 (倒流+書店)
     function triggerFail() {
       failSound.currentTime = 0;
       failSound.play().then(() => {
@@ -429,26 +394,32 @@
       }, 2000);
     }
 
-    // 💡 3. video2 播完 -> 播放 video4 (時間飛逝過場動畫)
+    // 3. video2 播完 -> 播放 video4 (時間飛逝過場)
     v2.onended = function() {
       v2.classList.remove('show');
       
       v4.classList.add('show');
       v4.play();
-      playBGM(); // 💡 video4 開始播放時恢復背景音樂
+      playBGM(); // video4 啟動背景音樂
     };
 
-    // 💡 4. video4 播完 -> 切回手機桌面 & 第二輪綠燈放榜簡訊 (英9)
+    // 4. video4 播完 -> 讓 video1 重新做為背景（停留最後一幀），並彈出綠燈簡訊
     v4.onended = function() {
       v4.classList.remove('show');
+      v1.classList.add('show'); // 重新顯現 video1 作為底圖
       
-      phoneDesktopUI.style.display = 'flex';
       uiRound2.style.display = 'flex';
     };
 
-    // 5. 點擊正取學校 -> 跳出最終成功彈窗
+    // 5. 點擊綠燈正取學校 -> 切換背景為 img2 (校門)，並顯示正取牌樓與最終彈窗
     function triggerSuccess(schoolName) {
       uiRound2.style.display = 'none';
+      v1.classList.remove('show'); // 隱藏手機底圖
+      
+      img2.classList.add('show'); // 切換成 img2 (校門)
+      gateTitleOverlay.innerText = schoolName;
+      gateTitleOverlay.style.display = 'block';
+
       uiFinal.style.display = 'flex';
       document.getElementById('final-desc').innerText = `因為補回了關鍵的 1 級分，你順利通過篩選，成功考取【${schoolName}】！`;
     }

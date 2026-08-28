@@ -44,22 +44,22 @@
       opacity: 0;
       will-change: opacity;
       transform: translateZ(0);
-      transition: opacity 0.15s linear;
+      transition: opacity 0.2s ease-in-out;
       pointer-events: none;
     }
 
-    /* 圖層層級控制 */
+    /* 圖層層級控制：確定底圖與影片順序 */
     #video1 { z-index: 10; }
-    #video2 { z-index: 5; }
-    #video4 { z-index: 6; }
-    #img2   { z-index: 12; } /* 最終結局畫面圖層 */
+    #video2 { z-index: 15; }
+    #video4 { z-index: 20; }
+    #img2   { z-index: 25; }
 
     .show {
       opacity: 1 !important;
       pointer-events: auto !important;
     }
 
-    /* 解鎖聲音彈窗 */
+    /* 開始彈窗 */
     #start-overlay {
       position: absolute;
       top: 0;
@@ -87,7 +87,7 @@
       animation: pulse 1.5s infinite;
     }
 
-    /* 簡訊選單浮層 UI */
+    /* 簡訊選單 UI */
     .ui-overlay {
       position: absolute;
       top: 0;
@@ -101,7 +101,7 @@
       align-items: center;
       padding: 20px;
       text-align: center;
-      z-index: 25;
+      z-index: 30;
     }
 
     .sms-notification {
@@ -116,7 +116,7 @@
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
       color: #000;
       text-align: left;
-      z-index: 26;
+      z-index: 31;
       pointer-events: auto;
     }
 
@@ -140,15 +140,8 @@
       line-height: 1.35;
     }
 
-    .highlight-score {
-      color: #d32f2f;
-      font-weight: bold;
-    }
-
-    .highlight-pass {
-      color: #2e7d32;
-      font-weight: bold;
-    }
+    .highlight-score { color: #d32f2f; font-weight: bold; }
+    .highlight-pass { color: #2e7d32; font-weight: bold; }
 
     .button-group {
       width: 100%;
@@ -190,7 +183,7 @@
       width: 82%;
       box-shadow: 0 0 25px rgba(255, 0, 0, 0.6);
       display: none;
-      z-index: 30;
+      z-index: 40;
       text-align: center;
       border: 2px solid #ff5252;
       animation: shake 0.4s ease-in-out;
@@ -204,10 +197,10 @@
       80% { transform: translate(-48%, -50%); }
     }
 
-    /* 校門牌樓上方顯示的學校名稱 */
+    /* 校門牌樓上方學校名稱 */
     #gate-title-overlay {
       position: absolute;
-      top: 17%; /* 壓在校門石磚上面的位置 */
+      top: 17%;
       left: 50%;
       transform: translateX(-50%);
       font-size: 1.3rem;
@@ -253,7 +246,7 @@
       <button class="start-btn">🔊 點擊開始體驗</button>
     </div>
 
-    <!-- 影片 1：看成績前 -->
+    <!-- 影片 1：看成績前 (最後一幀會留作放榜背景) -->
     <video id="video1" class="media-element show" playsinline preload="auto">
       <source src="video1.mp4" type="video/mp4">
     </video>
@@ -263,12 +256,12 @@
       <source src="video2.mp4" type="video/mp4">
     </video>
 
-    <!-- 影片 4：時間飛逝過場動畫 -->
+    <!-- 影片 4：時間飛逝動畫 -->
     <video id="video4" class="media-element" playsinline preload="auto">
       <source src="video4.mp4" type="video/mp4">
     </video>
 
-    <!-- 圖片 2：校門正取畫面 (恭喜錄取的背景) -->
+    <!-- 圖片 2：校門正取圖 -->
     <img id="img2" class="media-element" src="img2.jpg" alt="校門正取畫面">
 
     <!-- 第一輪選擇 UI (失敗線) -->
@@ -324,7 +317,7 @@
       </div>
     </div>
 
-    <!-- 校門牌樓上的學校名稱 -->
+    <!-- 校門牌樓名稱 -->
     <div id="gate-title-overlay">國立臺灣大學</div>
 
     <!-- 最終結局畫面 -->
@@ -365,19 +358,17 @@
       v1.play();
     }
 
-    // 1. video1 播完 -> 畫面直接停留於 video1 最後一幀，並浮現簡訊與選項
+    // 1. video1 播完 -> 停留於最後一幀，顯示第一輪 UI
     v1.onended = function() {
       uiRound1.style.display = 'flex';
       playBGM();
     };
 
-    // 2. 點擊學校失敗 -> 彈出警告 -> 切換至 video2 (倒流+書店)
+    // 2. 點擊失敗 -> 播警告音效 -> 隱藏 uiRound1 並無縫進入 video2
     function triggerFail() {
       failSound.currentTime = 0;
       failSound.play().then(() => {
-        setTimeout(() => {
-          failSound.pause();
-        }, 1000);
+        setTimeout(() => { failSound.pause(); }, 1000);
       }).catch(e => console.log("音效錯誤：", e));
 
       alertModal.style.display = 'block';
@@ -386,37 +377,37 @@
         alertModal.style.display = 'none';
         uiRound1.style.display = 'none';
         
-        bgm.pause(); // 進入 video2 靜音 BGM
+        bgm.pause();
         
         v2.classList.add('show');
-        v1.classList.remove('show');
         v2.play();
       }, 2000);
     }
 
-    // 3. video2 播完 -> 播放 video4 (時間飛逝過場)
+    // 3. video2 播完 -> 預先播放 video4，確保無縫對接（消除中間黑屏）
     v2.onended = function() {
-      v2.classList.remove('show');
-      
       v4.classList.add('show');
       v4.play();
-      playBGM(); // video4 啟動背景音樂
+      playBGM();
+
+      // 稍微延遲隱藏 v2，避免看到背景黑底
+      setTimeout(() => {
+        v2.classList.remove('show');
+      }, 100);
     };
 
-    // 4. video4 播完 -> 讓 video1 重新做為背景（停留最後一幀），並彈出綠燈簡訊
+    // 4. video4 播完 -> 淡出 video4，底層的 video1 畫面無縫顯現作為放榜背景
     v4.onended = function() {
       v4.classList.remove('show');
-      v1.classList.add('show'); // 重新顯現 video1 作為底圖
-      
       uiRound2.style.display = 'flex';
     };
 
-    // 5. 點擊綠燈正取學校 -> 切換背景為 img2 (校門)，並顯示正取牌樓與最終彈窗
+    // 5. 點擊正取學校 -> 切換底圖為校門圖片 (img2)，顯示正取文字與結局
     function triggerSuccess(schoolName) {
       uiRound2.style.display = 'none';
-      v1.classList.remove('show'); // 隱藏手機底圖
+      v1.classList.remove('show');
       
-      img2.classList.add('show'); // 切換成 img2 (校門)
+      img2.classList.add('show');
       gateTitleOverlay.innerText = schoolName;
       gateTitleOverlay.style.display = 'block';
 

@@ -44,22 +44,21 @@
       opacity: 0;
       will-change: opacity;
       transform: translateZ(0);
-      transition: opacity 0.2s ease-in-out;
+      transition: opacity 0.15s linear;
       pointer-events: none;
     }
 
-    /* 圖層層級控制：確定底圖與影片順序 */
+    /* 圖層層級控制 */
     #video1 { z-index: 10; }
     #video2 { z-index: 15; }
-    #video4 { z-index: 20; }
-    #img2   { z-index: 25; }
+    #img2   { z-index: 20; } /* 校門正取圖層 */
 
     .show {
       opacity: 1 !important;
       pointer-events: auto !important;
     }
 
-    /* 開始彈窗 */
+    /* 解鎖聲音彈窗 */
     #start-overlay {
       position: absolute;
       top: 0;
@@ -87,26 +86,72 @@
       animation: pulse 1.5s infinite;
     }
 
-    /* 簡訊選單 UI */
+    /* 手機桌面 UI */
+    #phone-desktop-ui {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 10px;
+      z-index: 22;
+      pointer-events: none;
+    }
+
+    .status-bar {
+      width: 100%;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #ffffff;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    }
+
+    .lock-screen-clock {
+      margin-top: 25px;
+      text-align: center;
+      color: #ffffff;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    .lock-date {
+      font-size: 1.1rem;
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+
+    .lock-time {
+      font-size: 4.5rem;
+      font-weight: 700;
+      line-height: 1.1;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Rounded", sans-serif;
+    }
+
     .ui-overlay {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.25);
+      background: rgba(0, 0, 0, 0.2);
       display: none;
       flex-direction: column;
       justify-content: flex-end;
       align-items: center;
       padding: 20px;
       text-align: center;
-      z-index: 30;
+      z-index: 25;
     }
 
     .sms-notification {
       position: absolute;
-      top: 22%;
+      top: 25%;
       width: 88%;
       background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(12px);
@@ -116,7 +161,7 @@
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
       color: #000;
       text-align: left;
-      z-index: 31;
+      z-index: 26;
       pointer-events: auto;
     }
 
@@ -140,8 +185,15 @@
       line-height: 1.35;
     }
 
-    .highlight-score { color: #d32f2f; font-weight: bold; }
-    .highlight-pass { color: #2e7d32; font-weight: bold; }
+    .highlight-score {
+      color: #d32f2f;
+      font-weight: bold;
+    }
+
+    .highlight-pass {
+      color: #2e7d32;
+      font-weight: bold;
+    }
 
     .button-group {
       width: 100%;
@@ -183,7 +235,7 @@
       width: 82%;
       box-shadow: 0 0 25px rgba(255, 0, 0, 0.6);
       display: none;
-      z-index: 40;
+      z-index: 30;
       text-align: center;
       border: 2px solid #ff5252;
       animation: shake 0.4s ease-in-out;
@@ -197,7 +249,36 @@
       80% { transform: translate(-48%, -50%); }
     }
 
-    /* 校門牌樓上方學校名稱 */
+    /* 過場文字畫面 */
+    #transition-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 35;
+      padding: 30px;
+    }
+
+    .transition-text {
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: #ffffff;
+      letter-spacing: 2px;
+      text-align: center;
+      animation: fadeInText 1s ease-in-out;
+    }
+
+    @keyframes fadeInText {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 校門牌樓上方顯示的學校名稱 */
     #gate-title-overlay {
       position: absolute;
       top: 17%;
@@ -208,7 +289,7 @@
       color: #d4af37;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
       letter-spacing: 2px;
-      z-index: 35;
+      z-index: 38;
       display: none;
       white-space: nowrap;
     }
@@ -246,24 +327,36 @@
       <button class="start-btn">🔊 點擊開始體驗</button>
     </div>
 
-    <!-- 影片 1：看成績前 (最後一幀會留作放榜背景) -->
+    <!-- 影片 1 (最後一幀會作為放榜背景) -->
     <video id="video1" class="media-element show" playsinline preload="auto">
       <source src="video1.mp4" type="video/mp4">
     </video>
 
-    <!-- 影片 2：倒流 + 書店 -->
+    <!-- 影片 2 (倒流 + 書店) -->
     <video id="video2" class="media-element" playsinline preload="auto">
       <source src="video2.mp4" type="video/mp4">
     </video>
 
-    <!-- 影片 4：時間飛逝動畫 -->
-    <video id="video4" class="media-element" playsinline preload="auto">
-      <source src="video4.mp4" type="video/mp4">
-    </video>
-
-    <!-- 圖片 2：校門正取圖 -->
+    <!-- 圖片 2 (校門正取圖) -->
     <img id="img2" class="media-element" src="img2.jpg" alt="校門正取畫面">
 
+    <!-- 過場文字畫面 -->
+    <div id="transition-overlay">
+      <div class="transition-text">很快，時間來到了放榜這一天.....</div>
+    </div>
+
+    <!-- 手機桌面 UI -->
+    <div id="phone-desktop-ui">
+      <div class="status-bar">
+        <span>中華電信</span>
+        <span>5G 📶 🔋 88%</span>
+      </div>
+      <div class="lock-screen-clock">
+        <div class="lock-date">6月5日 星期五</div>
+        <div class="lock-time">09:01</div>
+      </div>
+    </div>
+    
     <!-- 第一輪選擇 UI (失敗線) -->
     <div id="ui-round1" class="ui-overlay">
       <div class="sms-notification">
@@ -295,7 +388,7 @@
       <p style="font-size: 0.85rem; margin-top: 8px; opacity: 0.9;">連第一階段都無法通過...</p>
     </div>
 
-    <!-- 第二輪綠燈選擇 UI (成功放榜) -->
+    <!-- 第二輪綠燈選擇 UI (成功線) -->
     <div id="ui-round2" class="ui-overlay">
       <div class="sms-notification" style="border: 2px solid #4caf50;">
         <div class="sms-header">
@@ -317,7 +410,7 @@
       </div>
     </div>
 
-    <!-- 校門牌樓名稱 -->
+    <!-- 校門牌樓上顯示的學校名稱 -->
     <div id="gate-title-overlay">國立臺灣大學</div>
 
     <!-- 最終結局畫面 -->
@@ -335,16 +428,16 @@
   <script>
     const v1 = document.getElementById('video1');
     const v2 = document.getElementById('video2');
-    const v4 = document.getElementById('video4');
     const img2 = document.getElementById('img2');
-    
     const bgm = document.getElementById('bgm');
     const failSound = document.getElementById('failSound');
 
+    const phoneDesktopUI = document.getElementById('phone-desktop-ui');
     const uiRound1 = document.getElementById('ui-round1');
     const uiRound2 = document.getElementById('ui-round2');
     const uiFinal = document.getElementById('ui-final');
     const alertModal = document.getElementById('alert-modal');
+    const transitionOverlay = document.getElementById('transition-overlay');
     const gateTitleOverlay = document.getElementById('gate-title-overlay');
     const startOverlay = document.getElementById('start-overlay');
 
@@ -358,17 +451,19 @@
       v1.play();
     }
 
-    // 1. video1 播完 -> 停留於最後一幀，顯示第一輪 UI
+    // 第一階段：影片1播完 -> 顯示手機桌面 & 115學測(英8)簡訊
     v1.onended = function() {
+      phoneDesktopUI.style.display = 'flex';
       uiRound1.style.display = 'flex';
       playBGM();
     };
 
-    // 2. 點擊失敗 -> 播警告音效 -> 隱藏 uiRound1 並無縫進入 video2
     function triggerFail() {
       failSound.currentTime = 0;
       failSound.play().then(() => {
-        setTimeout(() => { failSound.pause(); }, 1000);
+        setTimeout(() => {
+          failSound.pause();
+        }, 1000);
       }).catch(e => console.log("音效錯誤：", e));
 
       alertModal.style.display = 'block';
@@ -377,37 +472,34 @@
         alertModal.style.display = 'none';
         uiRound1.style.display = 'none';
         
-        bgm.pause();
+        bgm.pause(); // 進入 video2 暫停 BGM
         
         v2.classList.add('show');
         v2.play();
       }, 2000);
     }
 
-    // 3. video2 播完 -> 預先播放 video4，確保無縫對接（消除中間黑屏）
+    // 第二階段：video2 播完 -> 純文字過場 -> 重新回到手機桌面 & 綠燈(英9)簡訊
     v2.onended = function() {
-      v4.classList.add('show');
-      v4.play();
+      v2.classList.remove('show');
+      transitionOverlay.style.display = 'flex';
       playBGM();
 
-      // 稍微延遲隱藏 v2，避免看到背景黑底
       setTimeout(() => {
-        v2.classList.remove('show');
-      }, 100);
+        transitionOverlay.style.display = 'none';
+        
+        // 重新切回同一個手機桌面，但套用綠燈選單
+        phoneDesktopUI.style.display = 'flex';
+        uiRound2.style.display = 'flex';
+      }, 2500);
     };
 
-    // 4. video4 播完 -> 淡出 video4，底層的 video1 畫面無縫顯現作為放榜背景
-    v4.onended = function() {
-      v4.classList.remove('show');
-      uiRound2.style.display = 'flex';
-    };
-
-    // 5. 點擊正取學校 -> 切換底圖為校門圖片 (img2)，顯示正取文字與結局
+    // 點擊綠燈學校 -> 隱藏手機 UI 並顯示 img2 (校門) + 學校名稱 + 恭喜彈窗
     function triggerSuccess(schoolName) {
       uiRound2.style.display = 'none';
-      v1.classList.remove('show');
+      phoneDesktopUI.style.display = 'none'; // 隱藏手機時間與頂部列
       
-      img2.classList.add('show');
+      img2.classList.add('show'); // 切換成校門底圖
       gateTitleOverlay.innerText = schoolName;
       gateTitleOverlay.style.display = 'block';
 

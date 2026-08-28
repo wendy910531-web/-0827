@@ -86,7 +86,7 @@
       animation: pulse 1.5s infinite;
     }
 
-    /* 手機桌面 UI */
+    /* 手機桌面 UI (只在第一階段顯示) */
     #phone-desktop-ui {
       position: absolute;
       top: 0;
@@ -185,15 +185,8 @@
       line-height: 1.35;
     }
 
-    .highlight-score {
-      color: #d32f2f;
-      font-weight: bold;
-    }
-
-    .highlight-pass {
-      color: #2e7d32;
-      font-weight: bold;
-    }
+    .highlight-score { color: #d32f2f; font-weight: bold; }
+    .highlight-pass { color: #2e7d32; font-weight: bold; }
 
     .button-group {
       width: 100%;
@@ -327,7 +320,7 @@
       <button class="start-btn">🔊 點擊開始體驗</button>
     </div>
 
-    <!-- 影片 1 (最後一幀會作為放榜背景) -->
+    <!-- 影片 1 -->
     <video id="video1" class="media-element show" playsinline preload="auto">
       <source src="video1.mp4" type="video/mp4">
     </video>
@@ -345,7 +338,7 @@
       <div class="transition-text">很快，時間來到了放榜這一天.....</div>
     </div>
 
-    <!-- 手機桌面 UI -->
+    <!-- 手機桌面 UI (第一階段專用) -->
     <div id="phone-desktop-ui">
       <div class="status-bar">
         <span>中華電信</span>
@@ -388,7 +381,7 @@
       <p style="font-size: 0.85rem; margin-top: 8px; opacity: 0.9;">連第一階段都無法通過...</p>
     </div>
 
-    <!-- 第二輪綠燈選擇 UI (成功線) -->
+    <!-- 第二輪綠燈選擇 UI (成功線：選項與一完全相同，英文成績改為 12) -->
     <div id="ui-round2" class="ui-overlay">
       <div class="sms-notification" style="border: 2px solid #4caf50;">
         <div class="sms-header">
@@ -397,16 +390,18 @@
         </div>
         <div class="sms-title" style="color: #2e7d32;">115學測成績通知 (235神助攻)</div>
         <div class="sms-body">
-          【大考中心】115學測成績：國12、<span class="highlight-pass">英9 (升1級)</span>、數A9、社11、自10。應試號碼：10012345。
+          【大考中心】115學測成績：國12、<span class="highlight-pass">英12 (提升過關)</span>、數A9、社11、自10。應試號碼：10012345。
         </div>
       </div>
 
       <div class="button-group">
-        <p style="font-size: 0.85rem; margin-bottom: 6px; color: #4caf50; font-weight: bold; text-shadow: 0 1px 4px #000;">【 235 神助攻！補回關鍵 1 級分 】</p>
-        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('國立臺灣大學')">綠燈解鎖！正取：國立臺灣大學</button>
-        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('國立政治大學')">綠燈解鎖！正取：國立政治大學</button>
-        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('國立清華大學')">綠燈解鎖！正取：國立清華大學</button>
-        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('國立成功大學')">綠燈解鎖！正取：國立成功大學</button>
+        <p style="font-size: 0.85rem; margin-bottom: 6px; color: #4caf50; font-weight: bold; text-shadow: 0 1px 4px #000;">請選擇欲選填之夢幻校系：</p>
+        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('國立臺灣大學 外文系')">綠燈解鎖！正取：國立臺灣大學 外文系</button>
+        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('國立政治大學 傳播學院')">綠燈解鎖！正取：國立政治大學 傳播學院</button>
+        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('國立清華大學 人文社會系')">綠燈解鎖！正取：國立清華大學 人文社會系</button>
+        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('國立成功大學 外文系')">綠燈解鎖！正取：國立成功大學 外文系</button>
+        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('國立臺灣師範大學 英語系')">綠燈解鎖！正取：國立臺灣師範大學 英語系</button>
+        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('國立交通大學 外文系')">綠燈解鎖！正取：國立交通大學 外文系</button>
       </div>
     </div>
 
@@ -451,7 +446,7 @@
       v1.play();
     }
 
-    // 第一階段：影片1播完 -> 顯示手機桌面 & 115學測(英8)簡訊
+    // 第一階段：影片1播完 -> 顯示手機桌面 UI & 115學測(英8)簡訊
     v1.onended = function() {
       phoneDesktopUI.style.display = 'flex';
       uiRound1.style.display = 'flex';
@@ -471,6 +466,7 @@
       setTimeout(() => {
         alertModal.style.display = 'none';
         uiRound1.style.display = 'none';
+        phoneDesktopUI.style.display = 'none'; // 隱藏手機 UI
         
         bgm.pause(); // 進入 video2 暫停 BGM
         
@@ -479,7 +475,7 @@
       }, 2000);
     }
 
-    // 第二階段：video2 播完 -> 純文字過場 -> 重新回到手機桌面 & 綠燈(英9)簡訊
+    // 第二階段：video2 播完 -> 純文字過場 -> 隱藏手機桌面 UI -> 跳出英文12級分的綠燈簡訊
     v2.onended = function() {
       v2.classList.remove('show');
       transitionOverlay.style.display = 'flex';
@@ -488,23 +484,24 @@
       setTimeout(() => {
         transitionOverlay.style.display = 'none';
         
-        // 重新切回同一個手機桌面，但套用綠燈選單
-        phoneDesktopUI.style.display = 'flex';
+        // 💡 確保手機螢幕畫面 (phoneDesktopUI) 保持隱藏狀態
+        phoneDesktopUI.style.display = 'none';
+        
+        // 只顯示綠燈放榜簡訊與一模一樣的 6 個選項
         uiRound2.style.display = 'flex';
       }, 2500);
     };
 
-    // 點擊綠燈學校 -> 隱藏手機 UI 並顯示 img2 (校門) + 學校名稱 + 恭喜彈窗
+    // 點擊綠燈學校 -> 顯示 img2 (校門) + 學校名稱 + 恭喜錄取彈窗
     function triggerSuccess(schoolName) {
       uiRound2.style.display = 'none';
-      phoneDesktopUI.style.display = 'none'; // 隱藏手機時間與頂部列
       
       img2.classList.add('show'); // 切換成校門底圖
-      gateTitleOverlay.innerText = schoolName;
+      gateTitleOverlay.innerText = schoolName.split(' ')[0]; // 取出學校簡稱（如：國立臺灣大學）
       gateTitleOverlay.style.display = 'block';
 
       uiFinal.style.display = 'flex';
-      document.getElementById('final-desc').innerText = `因為補回了關鍵的 1 級分，你順利通過篩選，成功考取【${schoolName}】！`;
+      document.getElementById('final-desc').innerText = `因為補回了關鍵的級分，你順利通過篩選，成功考取【${schoolName}】！`;
     }
   </script>
 

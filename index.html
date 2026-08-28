@@ -365,7 +365,8 @@
 
   <div id="game-container">
     <audio id="bgm" src="bgm.mp3" loop></audio>
-    <audio id="fail_Sound.mp3" src="fail_sound.mp3" preload="auto"></audio>
+    <!-- 修正：將 ID 改回 failSound 以匹配 JavaScript 呼叫 -->
+    <audio id="failSound" src="failSound.mp3" preload="auto"></audio>
 
     <div id="start-overlay" onclick="startGame()">
       <button class="start-btn">🔊 點擊開始體驗</button>

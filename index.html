@@ -166,11 +166,35 @@
       pointer-events: auto;
     }
 
+    /* 第二輪放榜黑框白底風格 */
+    .sms-notification-round2 {
+      position: absolute;
+      top: 25%;
+      width: 88%;
+      background: #ffffff;
+      border: 3px solid #000000;
+      border-radius: 16px;
+      padding: 14px 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      color: #000000;
+      text-align: left;
+      z-index: 26;
+      pointer-events: auto;
+    }
+
     .sms-header {
       display: flex;
       justify-content: space-between;
       font-size: 0.75rem;
       color: #666;
+      margin-bottom: 4px;
+    }
+
+    .sms-header-round2 {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #333;
       margin-bottom: 4px;
     }
 
@@ -186,8 +210,14 @@
       line-height: 1.35;
     }
 
+    .sms-body-round2 {
+      font-size: 0.88rem;
+      color: #000000;
+      line-height: 1.35;
+    }
+
     .highlight-score { color: #d32f2f; font-weight: bold; }
-    .highlight-pass { color: #2e7d32; font-weight: bold; }
+    .highlight-pass { color: #000000; font-weight: bold; }
 
     .button-group {
       width: 100%;
@@ -209,6 +239,26 @@
       cursor: pointer;
       transition: all 0.2s ease;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    /* 第二輪黑框白底按鈕風格 */
+    .school-btn-round2 {
+      background: #ffffff;
+      color: #000000;
+      border: 2px solid #000000;
+      padding: 12px 15px;
+      font-size: 0.98rem;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .school-btn-round2:hover {
+      background: #000000;
+      color: #ffffff;
+      transform: scale(1.02);
     }
 
     .school-btn:hover {
@@ -321,7 +371,7 @@
       <button class="start-btn">🔊 點擊開始體驗</button>
     </div>
 
-    <!-- 影片 1 -->
+    <!-- 影片 1 (包含原始音效) -->
     <video id="video1" class="media-element show" playsinline preload="auto">
       <source src="video1.mp4" type="video/mp4">
     </video>
@@ -387,27 +437,27 @@
       <p style="font-size: 0.85rem; margin-top: 8px; opacity: 0.9;">連第一階段都無法通過...</p>
     </div>
 
-    <!-- 第二輪綠燈選擇 UI (成功線：選項與一完全相同，英文成績改為 12) -->
+    <!-- 第二輪選擇 UI (黑框白底黑字) -->
     <div id="ui-round2" class="ui-overlay">
-      <div class="sms-notification" style="border: 2px solid #4caf50;">
-        <div class="sms-header">
+      <div class="sms-notification-round2">
+        <div class="sms-header-round2">
           <span>💬 訊息 ‧ 大考中心</span>
           <span>現在</span>
         </div>
-        <div class="sms-title" style="color: #2e7d32;">115學測成績通知 (235神助攻)</div>
-        <div class="sms-body">
+        <div class="sms-title" style="color: #000000;">115學測成績通知 (235神助攻)</div>
+        <div class="sms-body-round2">
           【大考中心】115學測成績：國12、<span class="highlight-pass">英12 (提升過關)</span>、數A9、社11、自10。應試號碼：10012345。
         </div>
       </div>
 
       <div class="button-group">
-        <p style="font-size: 0.85rem; margin-bottom: 6px; color: #4caf50; font-weight: bold; text-shadow: 0 1px 4px #000;">請選擇欲選填之夢幻校系：</p>
-        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('國立臺灣大學 外文系')">綠燈解鎖！正取：國立臺灣大學 外文系</button>
-        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('國立政治大學 傳播學院')">綠燈解鎖！正取：國立政治大學 傳播學院</button>
-        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('國立清華大學 人文社會系')">綠燈解鎖！正取：國立清華大學 人文社會系</button>
-        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('國立成功大學 外文系')">綠燈解鎖！正取：國立成功大學 外文系</button>
-        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('國立臺灣師範大學 英語系')">綠燈解鎖！正取：國立臺灣師範大學 英語系</button>
-        <button class="school-btn" style="border: 2px solid #4caf50;" onclick="triggerSuccess('國立交通大學 外文系')">綠燈解鎖！正取：國立交通大學 外文系</button>
+        <p style="font-size: 0.85rem; margin-bottom: 6px; color: #ffffff; font-weight: bold; text-shadow: 0 1px 4px #000;">請選擇欲選填之夢幻校系：</p>
+        <button class="school-btn-round2" onclick="triggerSuccess('國立臺灣大學 外文系')">國立臺灣大學 外文系</button>
+        <button class="school-btn-round2" onclick="triggerSuccess('國立政治大學 傳播學院')">國立政治大學 傳播學院</button>
+        <button class="school-btn-round2" onclick="triggerSuccess('國立清華大學 人文社會系')">國立清華大學 人文社會系</button>
+        <button class="school-btn-round2" onclick="triggerSuccess('國立成功大學 外文系')">國立成功大學 外文系</button>
+        <button class="school-btn-round2" onclick="triggerSuccess('國立臺灣師範大學 英語系')">國立臺灣師範大學 英語系</button>
+        <button class="school-btn-round2" onclick="triggerSuccess('國立交通大學 外文系')">國立交通大學 外文系</button>
       </div>
     </div>
 
@@ -449,8 +499,7 @@
 
     function startGame() {
       startOverlay.style.display = 'none';
-      bgm.pause();
-      v1.muted = false;
+      v1.muted = false; // 使用 Video1 原始音效
       v1.play();
     }
 
@@ -474,7 +523,7 @@
       setTimeout(() => {
         alertModal.style.display = 'none';
         uiRound1.style.display = 'none';
-        phoneDesktopUI.style.display = 'none'; // 隱藏手機 UI
+        phoneDesktopUI.style.display = 'none';
         
         bgm.pause();
         
@@ -484,16 +533,16 @@
       }, 2000);
     }
 
-    // 第二階段：video2 播完 -> 顯示「黑底白字過場」 -> 播放 video4
+    // 第二階段：video2 播完 -> 顯示「黑底白字過場」 -> 播放 video4 沿用 BGM
     v2.onended = function() {
       v2.classList.remove('show');
       transitionOverlay.style.display = 'flex';
       playBGM();
 
-      // 顯示過場文字 2.5 秒後，播放 video4
+      // 顯示過場文字 2.5 秒後，播放 video4 且維持背景音樂播放
       setTimeout(() => {
         transitionOverlay.style.display = 'none';
-        bgm.pause();
+        playBGM(); // 確保 VIDEO4 播放時沿用 BGM
 
         v4.muted = false;
         v4.classList.add('show');
@@ -501,7 +550,7 @@
       }, 2500);
     };
 
-    // 第三階段：video4 播完 -> 顯示第二輪綠燈簡訊 UI
+    // 第三階段：video4 播完 -> 顯示第二輪黑框白底放榜簡訊 UI
     v4.onended = function() {
       v4.classList.remove('show');
       playBGM();
